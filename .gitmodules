@@ -1,0 +1,9 @@
+[submodule "udagram-frontend"]
+	path = udagram-frontend
+	url = https://github.com/Femi-Lawal/udagram-frontend.git
+[submodule "udagram-user-api"]
+	path = udagram-user-api
+	url = https://github.com/Femi-Lawal/udagram-user-api.git
+[submodule "udagram-feed-api"]
+	path = udagram-feed-api
+	url = https://github.com/Femi-Lawal/udagram-feed-api.git
