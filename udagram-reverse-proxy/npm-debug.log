@@ -1,0 +1,22 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/home/femi/.nvm/v0.10.0/bin/node',
+1 verbose cli   '/home/femi/.nvm/v0.10.0/bin/npm',
+1 verbose cli   'i' ]
+2 info using npm@1.2.14
+3 info using node@v0.10.0
+4 verbose read json /mnt/d/project/package.json
+5 error install Couldn't read dependencies
+6 error Error: ENOENT, open '/mnt/d/project/package.json'
+7 error If you need help, you may report this log at:
+7 error     <http://github.com/isaacs/npm/issues>
+7 error or email it to:
+7 error     <npm-@googlegroups.com>
+8 error System Linux 4.4.0-18362-Microsoft
+9 error command "/home/femi/.nvm/v0.10.0/bin/node" "/home/femi/.nvm/v0.10.0/bin/npm" "i"
+10 error cwd /mnt/d/project/Udacity/project/udagram-reverse-proxy
+11 error node -v v0.10.0
+12 error npm -v 1.2.14
+13 error path /mnt/d/project/package.json
+14 error code ENOENT
+15 error errno 34
+16 verbose exit [ 34, true ]
