@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: udagram-sa
+  namespace: udagram
+  annotations:
+    # For AWS IRSA (IAM Roles for Service Accounts)
+    # eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/udagram-service-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: udagram-role
+  namespace: udagram
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: udagram-rolebinding
+  namespace: udagram
+subjects:
+  - kind: ServiceAccount
+    name: udagram-sa
+    namespace: udagram
+roleRef:
+  kind: Role
+  name: udagram-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: udagram-cluster-role
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: udagram-cluster-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: udagram-sa
+    namespace: udagram
+roleRef:
+  kind: ClusterRole
+  name: udagram-cluster-role
+  apiGroup: rbac.authorization.k8s.io
