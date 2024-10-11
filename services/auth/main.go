@@ -206,6 +206,13 @@ func main() {
 		api.GET("/verification", authService.Verify)
 	}
 
+	// Protected auth routes (require JWT)
+	apiProtected := router.Group("/api/v1/auth")
+	apiProtected.Use(middleware.JWTMiddleware(jwtConfig))
+	{
+		apiProtected.GET("/validate", authService.ValidateToken)
+	}
+
 	// User routes
 	users := router.Group("/api/v1/users")
 	users.Use(middleware.JWTMiddleware(jwtConfig))
@@ -475,11 +482,28 @@ func (s *AuthService) Logout(c *gin.Context) {
 	common.NoContentResponse(c)
 }
 
-// Verify verifies the JWT token
+// Verify verifies the JWT token (legacy, no auth required)
 func (s *AuthService) Verify(c *gin.Context) {
 	common.SuccessResponse(c, gin.H{
 		"auth":    true,
 		"message": "authenticated",
+	})
+}
+
+// ValidateToken validates the JWT token and returns user info (requires auth)
+func (s *AuthService) ValidateToken(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		common.UnauthorizedResponse(c, "not authenticated")
+		return
+	}
+
+	email, _ := c.Get("email")
+
+	common.SuccessResponse(c, gin.H{
+		"valid":   true,
+		"user_id": userID,
+		"email":   email,
 	})
 }
 
