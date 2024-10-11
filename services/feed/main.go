@@ -196,6 +196,7 @@ func main() {
 		api.DELETE("/:id", feedService.DeleteFeedItem)
 		api.GET("/signed-url/:filename", feedService.GetSignedURL)
 		api.POST("/:id/like", feedService.LikeFeedItem)
+		api.POST("/:id/unlike", feedService.UnlikeFeedItem)
 	}
 
 	// Legacy v0 routes
@@ -529,6 +530,34 @@ func (s *FeedService) LikeFeedItem(c *gin.Context) {
 	}
 
 	item.Likes++
+	if err := s.db.DB().Save(&item).Error; err != nil {
+		common.ErrorResponse(c, common.ErrInternalServer)
+		return
+	}
+
+	common.SuccessResponse(c, gin.H{
+		"likes": item.Likes,
+	})
+}
+
+// UnlikeFeedItem decrements the like count
+func (s *FeedService) UnlikeFeedItem(c *gin.Context) {
+	id := c.Param("id")
+
+	var item FeedItem
+	if err := s.db.DB().First(&item, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			common.NotFoundResponse(c, "feed item not found")
+			return
+		}
+		common.ErrorResponse(c, common.ErrInternalServer)
+		return
+	}
+
+	// Prevent negative likes
+	if item.Likes > 0 {
+		item.Likes--
+	}
 	if err := s.db.DB().Save(&item).Error; err != nil {
 		common.ErrorResponse(c, common.ErrInternalServer)
 		return
