@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { logAPIResponse } from "../test-utils";
 
 const FEED_URL = process.env.FEED_URL || "http://localhost:8082";
 const AUTH_URL = process.env.AUTH_URL || "http://localhost:8081";
@@ -276,8 +277,16 @@ test.describe("Feed API", () => {
         `${FEED_URL}/api/v1/feed/${itemId}/unlike`
       );
 
-      // Accept 200 or 404 (if unlike is idempotent and returns not found when already unliked)
-      expect([200, 404]).toContain(response.status());
+      expect(response.status()).toBe(200);
+
+      const body = await response.json();
+      expect(body.success).toBe(true);
+
+      // Log API response for verification
+      await logAPIResponse("unlike_feed_item", `${FEED_URL}/api/v1/feed/${itemId}/unlike`, {
+        status: response.status(),
+        body,
+      });
     });
   });
 

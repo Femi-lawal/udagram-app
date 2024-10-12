@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { logAPIResponse } from "../test-utils";
 
 const AUTH_URL = process.env.AUTH_URL || "http://localhost:8081";
 const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8080";
@@ -26,6 +27,12 @@ test.describe("Authentication API", () => {
       expect(body.data.user.email).toBe(email);
       expect(body.data.access_token).toBeTruthy();
       expect(body.data.refresh_token).toBeTruthy();
+
+      // Log API response for verification
+      await logAPIResponse("register_success", `${AUTH_URL}/api/v1/auth/register`, {
+        status: response.status(),
+        body: { success: body.success, hasToken: !!body.data.access_token },
+      });
     });
 
     test("should reject registration with invalid email", async ({
@@ -160,9 +167,7 @@ test.describe("Authentication API", () => {
   });
 
   test.describe("Token Validation", () => {
-    test.skip("should validate a valid access token", async ({ request }) => {
-      // Note: /api/v1/auth/validate endpoint not implemented
-      // Token validation happens at the gateway level via middleware
+    test("should validate a valid access token", async ({ request }) => {
       const email = generateEmail();
 
       // Register and get token
@@ -184,10 +189,19 @@ test.describe("Authentication API", () => {
       });
 
       expect(response.status()).toBe(200);
+
+      const body = await response.json();
+      expect(body.success).toBe(true);
+      expect(body.data.valid).toBe(true);
+
+      // Log API response for verification
+      await logAPIResponse("validate_token_success", `${AUTH_URL}/api/v1/auth/validate`, {
+        status: response.status(),
+        body,
+      });
     });
 
-    test.skip("should reject invalid access token", async ({ request }) => {
-      // Note: /api/v1/auth/validate endpoint not implemented
+    test("should reject invalid access token", async ({ request }) => {
       const response = await request.get(`${AUTH_URL}/api/v1/auth/validate`, {
         headers: {
           Authorization: "Bearer invalid-token",
@@ -195,14 +209,25 @@ test.describe("Authentication API", () => {
       });
 
       expect(response.status()).toBe(401);
+
+      // Log API response for verification
+      await logAPIResponse("validate_token_invalid", `${AUTH_URL}/api/v1/auth/validate`, {
+        status: response.status(),
+        body: await response.json().catch(() => ({})),
+      });
     });
 
-    test.skip("should reject missing authorization header", async ({
+    test("should reject missing authorization header", async ({
       request,
     }) => {
-      // Note: /api/v1/auth/validate endpoint not implemented
       const response = await request.get(`${AUTH_URL}/api/v1/auth/validate`);
       expect(response.status()).toBe(401);
+
+      // Log API response for verification
+      await logAPIResponse("validate_missing_auth", `${AUTH_URL}/api/v1/auth/validate`, {
+        status: response.status(),
+        body: await response.json().catch(() => ({})),
+      });
     });
   });
 
