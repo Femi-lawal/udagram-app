@@ -15,10 +15,13 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.BASE_URL || "http://localhost:8080",
-    trace: "on-first-retry",
-    video: "on-first-retry",
-    screenshot: "only-on-failure",
+    trace: "on",
+    video: "on",
+    screenshot: "on",
   },
+
+  // Output directory for test artifacts
+  outputDir: "./test-results",
 
   // Global timeout
   timeout: 30000,
@@ -41,6 +44,16 @@ export default defineConfig({
       name: "integration",
       testDir: "./e2e/integration",
       use: {},
+    },
+    {
+      name: "ui-screenshots",
+      testDir: "./e2e/ui",
+      use: {
+        ...devices["Desktop Chrome"],
+        screenshot: "on",
+        video: "on",
+        trace: "on",
+      },
     },
   ],
 
