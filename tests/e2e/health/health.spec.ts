@@ -1,4 +1,5 @@
 import { test, expect, APIRequestContext } from "@playwright/test";
+import { logAPIResponse } from "../test-utils";
 
 const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8080";
 const AUTH_URL = process.env.AUTH_URL || "http://localhost:8081";
@@ -13,6 +14,11 @@ test.describe("Service Health Checks", () => {
 
     const body = await response.json();
     expect(body.status).toBe("healthy");
+
+    await logAPIResponse("gateway_health", `${GATEWAY_URL}/health`, {
+      status: response.status(),
+      body,
+    });
   });
 
   test("Auth service is healthy", async ({ request }) => {
@@ -21,6 +27,11 @@ test.describe("Service Health Checks", () => {
 
     const body = await response.json();
     expect(body.status).toBe("healthy");
+
+    await logAPIResponse("auth_health", `${AUTH_URL}/health`, {
+      status: response.status(),
+      body,
+    });
   });
 
   test("Feed service is healthy", async ({ request }) => {

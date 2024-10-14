@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { logAPIResponse } from "../test-utils";
 
 const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8080";
 const AUTH_URL = process.env.AUTH_URL || "http://localhost:8081";
