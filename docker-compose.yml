@@ -11,12 +11,12 @@ services:
     environment:
       - ENVIRONMENT=development
       - PORT=8080
-      - JWT_SECRET=your-super-secret-key-change-in-production
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-prod}
       - JWT_ISSUER=udagram
       - AUTH_SERVICE_URL=http://auth:8081
       - FEED_SERVICE_URL=http://feed:8082
       - NOTIFICATION_SERVICE_URL=http://notification:8083
-      - ALLOWED_ORIGINS=*
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:80,http://localhost:4200}
       - TELEMETRY_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
     depends_on:
@@ -39,14 +39,14 @@ services:
       - PORT=8081
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_USER=udagram
-      - POSTGRES_PASSWORD=udagram_password
-      - POSTGRES_DB=udagram
+      - POSTGRES_USER=${POSTGRES_USER:-udagram}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-udagram_password}
+      - POSTGRES_DB=${POSTGRES_DB:-udagram}
       - POSTGRES_SSLMODE=disable
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - KAFKA_BROKERS=kafka:9092
-      - JWT_SECRET=your-super-secret-key-change-in-production
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-prod}
       - JWT_ISSUER=udagram
       - TELEMETRY_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
@@ -71,9 +71,9 @@ services:
       - PORT=8082
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_USER=udagram
-      - POSTGRES_PASSWORD=udagram_password
-      - POSTGRES_DB=udagram
+      - POSTGRES_USER=${POSTGRES_USER:-udagram}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-udagram_password}
+      - POSTGRES_DB=${POSTGRES_DB:-udagram}
       - POSTGRES_SSLMODE=disable
       - REDIS_HOST=redis
       - REDIS_PORT=6379
