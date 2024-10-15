@@ -215,6 +215,15 @@ func (g *Gateway) setupRoutes() {
 				protected.GET("/signed-url/:filename", g.proxyToFeed)
 			}
 		}
+
+		// Notification routes (protected)
+		notifications := v1.Group("/notifications")
+		notifications.Use(g.jwtMiddleware())
+		{
+			notifications.GET("", g.proxyToNotification)
+			notifications.POST("/send", g.proxyToNotification)
+			notifications.PUT("/:id/read", g.proxyToNotification)
+		}
 	}
 
 	// Legacy API v0 routes (backwards compatibility)
@@ -239,6 +248,10 @@ func (g *Gateway) proxyToAuth(c *gin.Context) {
 
 func (g *Gateway) proxyToFeed(c *gin.Context) {
 	g.proxyRequest(c, g.services.FeedServiceURL)
+}
+
+func (g *Gateway) proxyToNotification(c *gin.Context) {
+	g.proxyRequest(c, g.services.NotificationServiceURL)
 }
 
 func (g *Gateway) proxyRequest(c *gin.Context, targetURL string) {
