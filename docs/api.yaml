@@ -1,0 +1,407 @@
+openapi: 3.0.3
+info:
+  title: Udagram API
+  description: |
+    RESTful API for the Udagram photo-sharing platform.
+
+    ## Authentication
+    Most endpoints require a Bearer token in the Authorization header.
+    Obtain tokens via `/api/v1/auth/login` or `/api/v1/auth/register`.
+  version: 1.0.0
+  contact:
+    name: Udagram Team
+    email: support@udagram.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://api.udagram.com
+    description: Production
+
+tags:
+  - name: Auth
+    description: Authentication and user management
+  - name: Feed
+    description: Photo feed operations
+  - name: Notifications
+    description: User notifications
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/auth/validate:
+    get:
+      tags: [Auth]
+      summary: Validate JWT token
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      user_id:
+                        type: string
+                      email:
+                        type: string
+
+  /api/v1/feed:
+    get:
+      tags: [Feed]
+      summary: Get feed items
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Feed items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedResponse"
+    post:
+      tags: [Feed]
+      summary: Create feed item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [caption, url]
+              properties:
+                caption:
+                  type: string
+                url:
+                  type: string
+                  format: uri
+      responses:
+        "201":
+          description: Item created
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/feed/{id}:
+    get:
+      tags: [Feed]
+      summary: Get feed item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Feed item
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/feed/{id}/like:
+    post:
+      tags: [Feed]
+      summary: Like a feed item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item liked
+
+  /api/v1/feed/{id}/unlike:
+    post:
+      tags: [Feed]
+      summary: Unlike a feed item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item unliked
+
+  /api/v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: Get user notifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notifications list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+
+  /api/v1/notifications/send:
+    post:
+      tags: [Notifications]
+      summary: Send notification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, type, message]
+              properties:
+                user_id:
+                  type: string
+                type:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Notification sent
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            user:
+              $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        avatar:
+          type: string
+
+    FeedItem:
+      type: object
+      properties:
+        id:
+          type: string
+        caption:
+          type: string
+        url:
+          type: string
+        likes:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    FeedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/FeedItem"
+            total:
+              type: integer
+            page:
+              type: integer
+            total_pages:
+              type: integer
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [like, comment, follow, mention, welcome]
+        message:
+          type: string
+        read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: UNAUTHORIZED
+                  message:
+                    type: string
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: NOT_FOUND
+                  message:
+                    type: string
