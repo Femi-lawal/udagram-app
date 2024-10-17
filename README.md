@@ -43,6 +43,32 @@ A production-ready, cloud-native image sharing microservices platform demonstrat
     └─────────────────┘  └─────────────────┘  └─────────────────┘
 ```
 
+## 📸 Application Screenshots
+
+> Screenshots captured automatically via Playwright E2E tests demonstrating key features.
+
+### Login & Registration
+
+| Login Page | Registration Page |
+|:----------:|:-----------------:|
+| ![Login](screenshots/01-login-page.png) | ![Register](screenshots/02-register-page.png) |
+
+### Main Application
+
+| Feed Page | Explore Page |
+|:---------:|:------------:|
+| ![Feed](screenshots/03-feed-page.png) | ![Explore](screenshots/04-explore-page.png) |
+
+| Upload Page | Profile Page |
+|:-----------:|:------------:|
+| ![Upload](screenshots/05-upload-page.png) | ![Profile](screenshots/06-profile-page.png) |
+
+### Mobile Responsive
+
+| Mobile View |
+|:-----------:|
+| ![Mobile](screenshots/07-mobile-view.png) |
+
 ## 🚀 Features
 
 ### Microservices
@@ -271,6 +297,30 @@ make test-e2e
 # Run load tests
 make test-load
 ```
+
+### E2E Testing with Playwright
+
+The project includes comprehensive Playwright E2E tests covering:
+
+- **76 automated tests** across API and UI
+- API tests for auth, feed, and notification services
+- UI screenshot tests for visual verification
+- Health check and integration tests
+
+```bash
+# Run Playwright tests
+cd tests
+npm install
+npx playwright test
+
+# Run with headed browser
+npx playwright test --headed
+
+# Run specific project
+npx playwright test --project=ui-screenshots
+```
+
+Test results automatically capture screenshots to `tests/screenshots/ui/`.
 
 ## 🔒 Security
 
