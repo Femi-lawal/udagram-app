@@ -1,0 +1,12 @@
+{
+  "test": "unlike_feed_item",
+  "endpoint": "http://localhost:8082/api/v1/feed/72e47eab-d6e8-49ce-bb9a-005ffaed690d/unlike",
+  "timestamp": "2025-12-18T00:37:05.115Z",
+  "status": 200,
+  "body": {
+    "success": true,
+    "data": {
+      "likes": 0
+    }
+  }
+}

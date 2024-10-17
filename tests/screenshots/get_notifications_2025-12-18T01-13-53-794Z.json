@@ -1,0 +1,10 @@
+{
+  "test": "get_notifications",
+  "endpoint": "http://localhost:8083/api/v1/notifications",
+  "timestamp": "2025-12-18T01:13:53.794Z",
+  "status": 200,
+  "body": {
+    "success": true,
+    "data": []
+  }
+}

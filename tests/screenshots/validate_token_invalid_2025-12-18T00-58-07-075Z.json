@@ -1,0 +1,13 @@
+{
+  "test": "validate_token_invalid",
+  "endpoint": "http://localhost:8081/api/v1/auth/validate",
+  "timestamp": "2025-12-18T00:58:07.075Z",
+  "status": 401,
+  "body": {
+    "success": false,
+    "error": {
+      "code": "UNAUTHORIZED",
+      "message": "invalid or expired token"
+    }
+  }
+}

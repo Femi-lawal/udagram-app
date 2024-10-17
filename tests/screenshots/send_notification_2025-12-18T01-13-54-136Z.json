@@ -1,0 +1,12 @@
+{
+  "test": "send_notification",
+  "endpoint": "http://localhost:8083/api/v1/notifications/send",
+  "timestamp": "2025-12-18T01:13:54.136Z",
+  "status": 200,
+  "body": {
+    "success": true,
+    "data": {
+      "status": "sent"
+    }
+  }
+}

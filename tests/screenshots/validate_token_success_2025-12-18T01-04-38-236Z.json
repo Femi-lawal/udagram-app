@@ -1,0 +1,14 @@
+{
+  "test": "validate_token_success",
+  "endpoint": "http://localhost:8081/api/v1/auth/validate",
+  "timestamp": "2025-12-18T01:04:38.236Z",
+  "status": 200,
+  "body": {
+    "success": true,
+    "data": {
+      "email": "e2e-1766019877940-6srjtv@test.com",
+      "user_id": "0156ea99-03bc-475a-8f7a-c998b658bc06",
+      "valid": true
+    }
+  }
+}

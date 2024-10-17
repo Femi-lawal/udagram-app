@@ -1,0 +1,10 @@
+{
+  "test": "auth_health",
+  "endpoint": "http://localhost:8081/health",
+  "timestamp": "2025-12-18T01:04:40.780Z",
+  "status": 200,
+  "body": {
+    "status": "healthy",
+    "timestamp": "2025-12-18T01:04:40Z"
+  }
+}

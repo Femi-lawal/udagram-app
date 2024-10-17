@@ -1,0 +1,10 @@
+{
+  "test": "notification_health",
+  "endpoint": "http://localhost:8083/health",
+  "timestamp": "2025-12-18T01:13:53.735Z",
+  "status": 200,
+  "body": {
+    "status": "healthy",
+    "timestamp": "2025-12-18T01:13:53Z"
+  }
+}

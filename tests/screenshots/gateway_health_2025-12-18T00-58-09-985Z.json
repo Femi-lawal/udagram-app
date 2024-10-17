@@ -1,0 +1,10 @@
+{
+  "test": "gateway_health",
+  "endpoint": "http://localhost:8080/health",
+  "timestamp": "2025-12-18T00:58:09.985Z",
+  "status": 200,
+  "body": {
+    "status": "healthy",
+    "timestamp": "2025-12-18T00:58:09Z"
+  }
+}

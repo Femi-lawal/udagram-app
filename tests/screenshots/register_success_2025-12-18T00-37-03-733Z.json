@@ -1,0 +1,10 @@
+{
+  "test": "register_success",
+  "endpoint": "http://localhost:8081/api/v1/auth/register",
+  "timestamp": "2025-12-18T00:37:03.733Z",
+  "status": 201,
+  "body": {
+    "success": true,
+    "hasToken": true
+  }
+}
