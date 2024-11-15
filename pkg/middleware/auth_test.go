@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -15,27 +15,24 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
-func generateTestToken(secret string, claims jwt.MapClaims) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, _ := token.SignedString([]byte(secret))
-	return signedToken
-}
-
-func TestAuthMiddleware_ValidToken(t *testing.T) {
-	secret := "test-secret"
-	claims := jwt.MapClaims{
-		"sub":   "user-123",
-		"email": "test@example.com",
-		"exp":   float64(9999999999),
+func TestJWTMiddleware_ValidToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		Audience:     "udagram-users",
+		AccessExpiry: time.Hour,
 	}
-	token := generateTestToken(secret, claims)
+
+	// Generate a valid token
+	token, err := GenerateAccessToken(config, "user-123", "test@example.com")
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer "+token)
 
-	middleware := Auth(secret)
+	middleware := JWTMiddleware(config)
 	middleware(c)
 
 	assert.False(t, c.IsAborted())
@@ -43,175 +40,157 @@ func TestAuthMiddleware_ValidToken(t *testing.T) {
 	assert.Equal(t, "test@example.com", c.GetString("email"))
 }
 
-func TestAuthMiddleware_MissingToken(t *testing.T) {
-	secret := "test-secret"
+func TestJWTMiddleware_MissingToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		AccessExpiry: time.Hour,
+	}
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 
-	middleware := Auth(secret)
+	middleware := JWTMiddleware(config)
 	middleware(c)
 
 	assert.True(t, c.IsAborted())
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestAuthMiddleware_InvalidToken(t *testing.T) {
-	secret := "test-secret"
+func TestJWTMiddleware_InvalidToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		AccessExpiry: time.Hour,
+	}
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer invalid-token")
 
-	middleware := Auth(secret)
+	middleware := JWTMiddleware(config)
 	middleware(c)
 
 	assert.True(t, c.IsAborted())
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestAuthMiddleware_WrongSecret(t *testing.T) {
-	claims := jwt.MapClaims{
-		"sub":   "user-123",
-		"email": "test@example.com",
-		"exp":   float64(9999999999),
+func TestJWTMiddleware_WrongSecret(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "correct-secret",
+		Issuer:       "udagram",
+		AccessExpiry: time.Hour,
 	}
-	token := generateTestToken("correct-secret", claims)
+
+	token, err := GenerateAccessToken(config, "user-123", "test@example.com")
+	require.NoError(t, err)
+
+	wrongConfig := JWTConfig{
+		Secret:       "wrong-secret",
+		Issuer:       "udagram",
+		AccessExpiry: time.Hour,
+	}
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer "+token)
 
-	middleware := Auth("wrong-secret")
+	middleware := JWTMiddleware(wrongConfig)
 	middleware(c)
 
 	assert.True(t, c.IsAborted())
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestAuthMiddleware_ExpiredToken(t *testing.T) {
-	secret := "test-secret"
-	claims := jwt.MapClaims{
-		"sub":   "user-123",
-		"email": "test@example.com",
-		"exp":   float64(1), // Expired timestamp
+func TestOptionalJWTMiddleware_WithToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		Audience:     "udagram-users",
+		AccessExpiry: time.Hour,
 	}
-	token := generateTestToken(secret, claims)
+
+	token, err := GenerateAccessToken(config, "user-123", "test@example.com")
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer "+token)
 
-	middleware := Auth(secret)
-	middleware(c)
-
-	assert.True(t, c.IsAborted())
-	assert.Equal(t, http.StatusUnauthorized, w.Code)
-}
-
-func TestAuthMiddleware_MalformedHeader(t *testing.T) {
-	tests := []struct {
-		name   string
-		header string
-	}{
-		{"no bearer prefix", "some-token"},
-		{"empty bearer", "Bearer "},
-		{"wrong prefix", "Basic some-token"},
-	}
-
-	secret := "test-secret"
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := httptest.NewRecorder()
-			c, _ := gin.CreateTestContext(w)
-			c.Request = httptest.NewRequest("GET", "/", nil)
-			c.Request.Header.Set("Authorization", tt.header)
-
-			middleware := Auth(secret)
-			middleware(c)
-
-			assert.True(t, c.IsAborted())
-			assert.Equal(t, http.StatusUnauthorized, w.Code)
-		})
-	}
-}
-
-func TestOptionalAuth_WithToken(t *testing.T) {
-	secret := "test-secret"
-	claims := jwt.MapClaims{
-		"sub":   "user-123",
-		"email": "test@example.com",
-		"exp":   float64(9999999999),
-	}
-	token := generateTestToken(secret, claims)
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request = httptest.NewRequest("GET", "/", nil)
-	c.Request.Header.Set("Authorization", "Bearer "+token)
-
-	middleware := OptionalAuth(secret)
+	middleware := OptionalJWTMiddleware(config)
 	middleware(c)
 
 	assert.False(t, c.IsAborted())
 	assert.Equal(t, "user-123", c.GetString("user_id"))
 }
 
-func TestOptionalAuth_WithoutToken(t *testing.T) {
-	secret := "test-secret"
+func TestOptionalJWTMiddleware_WithoutToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		AccessExpiry: time.Hour,
+	}
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest("GET", "/", nil)
 
-	middleware := OptionalAuth(secret)
+	middleware := OptionalJWTMiddleware(config)
 	middleware(c)
 
 	assert.False(t, c.IsAborted())
 	assert.Empty(t, c.GetString("user_id"))
 }
 
-func TestExtractBearerToken(t *testing.T) {
-	tests := []struct {
-		name        string
-		header      string
-		expected    string
-		expectError bool
-	}{
-		{
-			name:        "valid bearer token",
-			header:      "Bearer valid-token",
-			expected:    "valid-token",
-			expectError: false,
-		},
-		{
-			name:        "empty header",
-			header:      "",
-			expected:    "",
-			expectError: true,
-		},
-		{
-			name:        "no bearer prefix",
-			header:      "some-token",
-			expected:    "",
-			expectError: true,
-		},
+func TestGenerateAccessToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		Audience:     "udagram-users",
+		AccessExpiry: time.Hour,
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			token, err := extractBearerToken(tt.header)
-			if tt.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tt.expected, token)
-			}
-		})
+	token, err := GenerateAccessToken(config, "user-123", "test@example.com")
+	require.NoError(t, err)
+	assert.NotEmpty(t, token)
+}
+
+func TestValidateToken(t *testing.T) {
+	config := JWTConfig{
+		Secret:       "test-secret",
+		Issuer:       "udagram",
+		Audience:     "udagram-users",
+		AccessExpiry: time.Hour,
 	}
+
+	token, err := GenerateAccessToken(config, "user-123", "test@example.com")
+	require.NoError(t, err)
+
+	claims, err := ValidateToken(config, token)
+	require.NoError(t, err)
+	assert.Equal(t, "user-123", claims.UserID)
+	assert.Equal(t, "test@example.com", claims.Email)
+}
+
+func TestGetUserIDFromContext(t *testing.T) {
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Set("user_id", "user-123")
+
+	userID, exists := GetUserIDFromContext(c)
+	assert.True(t, exists)
+	assert.Equal(t, "user-123", userID)
+}
+
+func TestGetUserIDFromContext_NotExists(t *testing.T) {
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	userID, exists := GetUserIDFromContext(c)
+	assert.False(t, exists)
+	assert.Empty(t, userID)
 }

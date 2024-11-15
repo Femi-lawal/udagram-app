@@ -10,32 +10,27 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func TestNewLogger(t *testing.T) {
+func TestInitLogger(t *testing.T) {
 	tests := []struct {
 		name        string
-		level       string
+		serviceName string
 		environment string
 	}{
 		{
 			name:        "development logger",
-			level:       "debug",
+			serviceName: "test-service",
 			environment: "development",
 		},
 		{
 			name:        "production logger",
-			level:       "info",
-			environment: "production",
-		},
-		{
-			name:        "error level logger",
-			level:       "error",
+			serviceName: "test-service",
 			environment: "production",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			logger := NewLogger(tt.level, tt.environment)
+			logger := InitLogger(tt.serviceName, tt.environment)
 			require.NotNil(t, logger)
 		})
 	}
@@ -81,41 +76,4 @@ func TestLoggerWithFields(t *testing.T) {
 	assert.Contains(t, output, "status_code")
 	assert.Contains(t, output, "200")
 	assert.Contains(t, output, "success")
-}
-
-func TestParseLogLevel(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected zapcore.Level
-	}{
-		{"debug", zapcore.DebugLevel},
-		{"info", zapcore.InfoLevel},
-		{"warn", zapcore.WarnLevel},
-		{"error", zapcore.ErrorLevel},
-		{"DEBUG", zapcore.DebugLevel},
-		{"INFO", zapcore.InfoLevel},
-		{"invalid", zapcore.InfoLevel}, // defaults to info
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			level := parseLogLevel(tt.input)
-			assert.Equal(t, tt.expected, level)
-		})
-	}
-}
-
-func parseLogLevel(level string) zapcore.Level {
-	switch level {
-	case "debug", "DEBUG":
-		return zapcore.DebugLevel
-	case "info", "INFO":
-		return zapcore.InfoLevel
-	case "warn", "WARN":
-		return zapcore.WarnLevel
-	case "error", "ERROR":
-		return zapcore.ErrorLevel
-	default:
-		return zapcore.InfoLevel
-	}
 }

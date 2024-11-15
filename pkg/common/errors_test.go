@@ -8,126 +8,111 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewAppError(t *testing.T) {
-	tests := []struct {
-		name         string
-		errorType    ErrorType
-		message      string
-		expectedCode int
-	}{
-		{
-			name:         "validation error",
-			errorType:    ErrValidation,
-			message:      "invalid email format",
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:         "authentication error",
-			errorType:    ErrAuthentication,
-			message:      "invalid credentials",
-			expectedCode: http.StatusUnauthorized,
-		},
-		{
-			name:         "authorization error",
-			errorType:    ErrAuthorization,
-			message:      "access denied",
-			expectedCode: http.StatusForbidden,
-		},
-		{
-			name:         "not found error",
-			errorType:    ErrNotFound,
-			message:      "resource not found",
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name:         "conflict error",
-			errorType:    ErrConflict,
-			message:      "resource already exists",
-			expectedCode: http.StatusConflict,
-		},
-		{
-			name:         "internal error",
-			errorType:    ErrInternal,
-			message:      "internal server error",
-			expectedCode: http.StatusInternalServerError,
-		},
-		{
-			name:         "rate limit error",
-			errorType:    ErrRateLimit,
-			message:      "too many requests",
-			expectedCode: http.StatusTooManyRequests,
-		},
+func TestAppError(t *testing.T) {
+	err := &AppError{
+		Code:    http.StatusBadRequest,
+		Message: "validation failed",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := NewAppError(tt.errorType, tt.message, nil)
+	assert.Equal(t, http.StatusBadRequest, err.Code)
+	assert.Equal(t, "validation failed", err.Message)
+	assert.Equal(t, "validation failed", err.Error())
+}
 
-			assert.NotNil(t, err)
-			assert.Equal(t, tt.errorType, err.Type)
-			assert.Equal(t, tt.message, err.Message)
-			assert.Equal(t, tt.expectedCode, err.StatusCode())
-		})
+func TestAppErrorWithInternalError(t *testing.T) {
+	internalErr := errors.New("database connection failed")
+	err := &AppError{
+		Code:          http.StatusInternalServerError,
+		Message:       "internal error",
+		InternalError: internalErr,
 	}
+
+	assert.Equal(t, "database connection failed", err.Error())
+	assert.Equal(t, internalErr, errors.Unwrap(err))
 }
 
-func TestAppErrorWithCause(t *testing.T) {
-	cause := errors.New("underlying database error")
-	err := NewAppError(ErrInternal, "failed to fetch data", cause)
-
-	assert.NotNil(t, err)
-	assert.Equal(t, cause, err.Cause)
-	assert.Equal(t, ErrInternal, err.Type)
+func TestNewBadRequestError(t *testing.T) {
+	err := NewBadRequestError("invalid email format")
+	assert.Equal(t, http.StatusBadRequest, err.Code)
+	assert.Equal(t, "invalid email format", err.Message)
 }
 
-func TestAppErrorError(t *testing.T) {
-	err := NewAppError(ErrValidation, "invalid input", nil)
-	assert.Equal(t, "invalid input", err.Error())
-
-	errWithCause := NewAppError(ErrInternal, "operation failed", errors.New("cause"))
-	assert.Contains(t, errWithCause.Error(), "operation failed")
+func TestNewNotFoundError(t *testing.T) {
+	err := NewNotFoundError("user not found")
+	assert.Equal(t, http.StatusNotFound, err.Code)
+	assert.Equal(t, "user not found", err.Message)
 }
 
-func TestAppErrorUnwrap(t *testing.T) {
-	cause := errors.New("root cause")
-	err := NewAppError(ErrInternal, "wrapper error", cause)
-
-	unwrapped := errors.Unwrap(err)
-	assert.Equal(t, cause, unwrapped)
+func TestNewUnauthorizedError(t *testing.T) {
+	err := NewUnauthorizedError("invalid token")
+	assert.Equal(t, http.StatusUnauthorized, err.Code)
+	assert.Equal(t, "invalid token", err.Message)
 }
 
-func TestIsAppError(t *testing.T) {
-	appErr := NewAppError(ErrValidation, "test error", nil)
-	regularErr := errors.New("regular error")
+func TestNewForbiddenError(t *testing.T) {
+	err := NewForbiddenError("access denied")
+	assert.Equal(t, http.StatusForbidden, err.Code)
+	assert.Equal(t, "access denied", err.Message)
+}
 
-	assert.True(t, IsAppError(appErr))
-	assert.False(t, IsAppError(regularErr))
-	assert.False(t, IsAppError(nil))
+func TestNewConflictError(t *testing.T) {
+	err := NewConflictError("email already exists")
+	assert.Equal(t, http.StatusConflict, err.Code)
+	assert.Equal(t, "email already exists", err.Message)
+}
+
+func TestNewInternalServerError(t *testing.T) {
+	cause := errors.New("db error")
+	err := NewInternalServerError("database error", cause)
+	assert.Equal(t, http.StatusInternalServerError, err.Code)
+	assert.Equal(t, "database error", err.Message)
+	assert.Equal(t, cause, err.InternalError)
 }
 
 func TestWrapError(t *testing.T) {
-	originalErr := errors.New("original error")
-	wrapped := WrapError(originalErr, ErrInternal, "wrapped message")
+	// Test with nil error
+	assert.Nil(t, WrapError(nil, "should not wrap"))
 
-	assert.Equal(t, ErrInternal, wrapped.Type)
+	// Test with regular error
+	regularErr := errors.New("some error")
+	wrapped := WrapError(regularErr, "wrapped message")
+	assert.Equal(t, http.StatusInternalServerError, wrapped.Code)
 	assert.Equal(t, "wrapped message", wrapped.Message)
-	assert.Equal(t, originalErr, wrapped.Cause)
+	assert.Equal(t, regularErr, wrapped.InternalError)
+
+	// Test with AppError - should return same error
+	appErr := NewBadRequestError("original")
+	wrappedApp := WrapError(appErr, "should not change")
+	assert.Equal(t, appErr, wrappedApp)
 }
 
-func TestErrorHelpers(t *testing.T) {
-	validationErr := ValidationError("field is required")
-	assert.Equal(t, ErrValidation, validationErr.Type)
-	assert.Equal(t, http.StatusBadRequest, validationErr.StatusCode())
+func TestIsNotFoundError(t *testing.T) {
+	notFoundErr := NewNotFoundError("not found")
+	otherErr := NewBadRequestError("bad request")
+	regularErr := errors.New("regular error")
 
-	authErr := AuthenticationError("invalid token")
-	assert.Equal(t, ErrAuthentication, authErr.Type)
-	assert.Equal(t, http.StatusUnauthorized, authErr.StatusCode())
+	assert.True(t, IsNotFoundError(notFoundErr))
+	assert.False(t, IsNotFoundError(otherErr))
+	assert.False(t, IsNotFoundError(regularErr))
+}
 
-	notFoundErr := NotFoundError("user not found")
-	assert.Equal(t, ErrNotFound, notFoundErr.Type)
-	assert.Equal(t, http.StatusNotFound, notFoundErr.StatusCode())
+func TestIsUnauthorizedError(t *testing.T) {
+	unauthErr := NewUnauthorizedError("unauthorized")
+	otherErr := NewBadRequestError("bad request")
+	regularErr := errors.New("regular error")
 
-	internalErr := InternalError("unexpected error", nil)
-	assert.Equal(t, ErrInternal, internalErr.Type)
-	assert.Equal(t, http.StatusInternalServerError, internalErr.StatusCode())
+	assert.True(t, IsUnauthorizedError(unauthErr))
+	assert.False(t, IsUnauthorizedError(otherErr))
+	assert.False(t, IsUnauthorizedError(regularErr))
+}
+
+func TestCommonErrors(t *testing.T) {
+	assert.Equal(t, http.StatusNotFound, ErrNotFound.Code)
+	assert.Equal(t, http.StatusUnauthorized, ErrUnauthorized.Code)
+	assert.Equal(t, http.StatusForbidden, ErrForbidden.Code)
+	assert.Equal(t, http.StatusBadRequest, ErrBadRequest.Code)
+	assert.Equal(t, http.StatusInternalServerError, ErrInternalServer.Code)
+	assert.Equal(t, http.StatusConflict, ErrConflict.Code)
+	assert.Equal(t, http.StatusTooManyRequests, ErrTooManyRequests.Code)
+	assert.Equal(t, http.StatusServiceUnavailable, ErrServiceUnavailable.Code)
 }
