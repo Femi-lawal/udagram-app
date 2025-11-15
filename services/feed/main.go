@@ -591,7 +591,7 @@ func (s *FeedService) invalidateFeedCache(ctx context.Context) {
 	for i := 1; i <= 10; i++ {
 		for _, size := range []int{10, 20, 50} {
 			key := fmt.Sprintf("feed:page:%d:size:%d", i, size)
-			s.cache.Delete(ctx, key)
+			_ = s.cache.Delete(ctx, key)
 		}
 	}
 }

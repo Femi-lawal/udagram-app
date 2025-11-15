@@ -24,13 +24,6 @@ var (
 		[]string{"operation", "table"},
 	)
 
-	dbConnectionsActive = promauto.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "db_connections_active",
-			Help: "Number of active database connections",
-		},
-	)
-
 	dbErrors = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "db_errors_total",
