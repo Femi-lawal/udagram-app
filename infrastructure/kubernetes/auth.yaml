@@ -22,9 +22,14 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: udagram-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: auth
-          image: femilawal/udagram-auth:latest
+          image: femilawal/udagram-auth:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
@@ -61,6 +66,9 @@ spec:
             runAsUser: 1000
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
 ---
 apiVersion: v1
 kind: Service

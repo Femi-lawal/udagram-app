@@ -22,9 +22,14 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: udagram-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: gateway
-          image: femilawal/udagram-gateway:latest
+          image: femilawal/udagram-gateway:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
