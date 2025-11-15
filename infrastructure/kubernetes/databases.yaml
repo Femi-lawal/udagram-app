@@ -15,25 +15,25 @@ spec:
       labels:
         app: postgres
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        fsGroup: 70
       containers:
         - name: postgres
           image: postgres:15-alpine
-          ports:
-            - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: udagram-secrets
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: udagram-secrets
-                  key: POSTGRES_PASSWORD
-            - name: POSTGRES_DB
-              value: udagram
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
+            - name: run-volume
+              mountPath: /var/run/postgresql
+            - name: tmp-volume
+              mountPath: /tmp
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
           resources:
@@ -63,6 +63,10 @@ spec:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
+        - name: run-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -108,22 +112,25 @@ spec:
       labels:
         app: redis
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        fsGroup: 999
       containers:
         - name: redis
           image: redis:7-alpine
-          ports:
-            - containerPort: 6379
-          command:
-            - redis-server
-            - --appendonly
-            - "yes"
-            - --maxmemory
-            - "256mb"
-            - --maxmemory-policy
-            - allkeys-lru
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - name: redis-storage
               mountPath: /data
+            - name: tmp-volume
+              mountPath: /tmp
           resources:
             requests:
               memory: "128Mi"
@@ -149,6 +156,8 @@ spec:
         - name: redis-storage
           persistentVolumeClaim:
             claimName: redis-pvc
+        - name: tmp-volume
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

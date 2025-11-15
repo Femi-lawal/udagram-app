@@ -15,9 +15,29 @@ spec:
       labels:
         app: zookeeper
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: zookeeper
           image: confluentinc/cp-zookeeper:7.5.0
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data-volume
+              mountPath: /var/lib/zookeeper/data
+            - name: log-volume
+              mountPath: /var/lib/zookeeper/log
+            - name: secrets-volume
+              mountPath: /etc/kafka/secrets
+            - name: tmp-volume
+              mountPath: /tmp
           ports:
             - containerPort: 2181
           env:
@@ -48,6 +68,15 @@ spec:
                 - echo ruok | nc localhost 2181 | grep imok
             initialDelaySeconds: 10
             periodSeconds: 5
+      volumes:
+        - name: data-volume
+          emptyDir: {}
+        - name: log-volume
+          emptyDir: {}
+        - name: secrets-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -79,9 +108,27 @@ spec:
       labels:
         app: kafka
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: kafka
           image: confluentinc/cp-kafka:7.5.0
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data-volume
+              mountPath: /var/lib/kafka/data
+            - name: secrets-volume
+              mountPath: /etc/kafka/secrets
+            - name: tmp-volume
+              mountPath: /tmp
           ports:
             - containerPort: 9092
             - containerPort: 29092
@@ -127,6 +174,13 @@ spec:
                 - kafka-broker-api-versions --bootstrap-server localhost:9092
             initialDelaySeconds: 30
             periodSeconds: 10
+      volumes:
+        - name: data-volume
+          emptyDir: {}
+        - name: secrets-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
