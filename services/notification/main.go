@@ -30,7 +30,9 @@ type NotificationService struct {
 func main() {
 	// Initialize logger
 	logger := common.InitLogger("notification-service", os.Getenv("ENVIRONMENT"))
-	defer common.Sync()
+	defer func() {
+		_ = common.Sync()
+	}()
 
 	// Initialize telemetry
 	ctx := context.Background()
@@ -166,7 +168,9 @@ func main() {
 	}
 
 	if tp != nil {
-		tp.Shutdown(shutdownCtx)
+		if err := tp.Shutdown(shutdownCtx); err != nil {
+			logger.Error("failed to shutdown telemetry", zap.Error(err))
+		}
 	}
 
 	logger.Info("server exited")
@@ -194,7 +198,9 @@ func (s *NotificationService) handleUserCreated(ctx context.Context, event messa
 	// Store notification in Redis
 	if s.cache != nil {
 		key := fmt.Sprintf("notifications:%s", userID)
-		s.cache.LPush(ctx, key, notification)
+		if err := s.cache.LPush(ctx, key, notification); err != nil {
+			s.logger.Error("failed to push notification", zap.Error(err))
+		}
 	}
 
 	return nil
@@ -272,7 +278,9 @@ func getEnv(key, defaultValue string) string {
 func getEnvInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		var result int
-		fmt.Sscanf(value, "%d", &result)
+		if _, err := fmt.Sscanf(value, "%d", &result); err != nil {
+			return defaultValue
+		}
 		return result
 	}
 	return defaultValue

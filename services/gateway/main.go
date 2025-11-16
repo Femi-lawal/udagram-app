@@ -52,7 +52,9 @@ type Config struct {
 func main() {
 	// Initialize logger
 	logger := common.InitLogger("gateway", os.Getenv("ENVIRONMENT"))
-	defer common.Sync()
+	defer func() {
+		_ = common.Sync()
+	}()
 
 	// Load configuration
 	config := loadConfig()
@@ -112,7 +114,9 @@ func main() {
 	}
 
 	if tp != nil {
-		tp.Shutdown(ctx)
+		if err := tp.Shutdown(ctx); err != nil {
+			logger.Error("failed to shutdown telemetry", zap.Error(err))
+		}
 	}
 
 	logger.Info("server exited")
@@ -327,7 +331,9 @@ func getEnv(key, defaultValue string) string {
 func getEnvInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		var result int
-		fmt.Sscanf(value, "%d", &result)
+		if _, err := fmt.Sscanf(value, "%d", &result); err != nil {
+			return defaultValue
+		}
 		return result
 	}
 	return defaultValue

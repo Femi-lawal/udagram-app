@@ -100,7 +100,9 @@ type AuthService struct {
 func main() {
 	// Initialize logger
 	logger := common.InitLogger("auth-service", os.Getenv("ENVIRONMENT"))
-	defer common.Sync()
+	defer func() {
+		_ = common.Sync()
+	}()
 
 	// Initialize telemetry
 	ctx := context.Background()
@@ -130,7 +132,11 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to connect to database", zap.Error(err))
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.Error("failed to close database", zap.Error(err))
+		}
+	}()
 
 	// Run migrations
 	if err := db.Migrate(&User{}, &RefreshToken{}); err != nil {
@@ -263,7 +269,9 @@ func main() {
 	}
 
 	if tp != nil {
-		tp.Shutdown(ctx)
+		if err := tp.Shutdown(ctx); err != nil {
+			logger.Error("failed to shutdown telemetry", zap.Error(err))
+		}
 	}
 
 	logger.Info("server exited")
@@ -475,7 +483,9 @@ func (s *AuthService) Logout(c *gin.Context) {
 	if s.cache != nil {
 		userID := c.GetHeader("X-User-ID")
 		if userID != "" {
-			s.cache.DeleteSession(c.Request.Context(), userID)
+			if err := s.cache.DeleteSession(c.Request.Context(), userID); err != nil {
+				s.logger.Error("failed to delete session", zap.Error(err))
+			}
 		}
 	}
 
@@ -611,7 +621,9 @@ func getEnv(key, defaultValue string) string {
 func getEnvInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		var result int
-		fmt.Sscanf(value, "%d", &result)
+		if _, err := fmt.Sscanf(value, "%d", &result); err != nil {
+			return defaultValue
+		}
 		return result
 	}
 	return defaultValue
