@@ -1,0 +1,25 @@
+{
+  "name": "udagram-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Udagram microservices",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "test:api": "playwright test tests/api/",
+    "test:health": "playwright test tests/health/",
+    "test:integration": "go test -v ./tests/integration/...",
+    "load:smoke": "k6 run --out json=results/smoke.json tests/load/k6-load-test.js --env SCENARIO=smoke",
+    "load:full": "k6 run --out json=results/load.json tests/load/k6-load-test.js",
+    "load:slo": "k6 run --out json=results/slo.json tests/load/k6-slo-test.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

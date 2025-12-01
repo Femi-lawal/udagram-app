@@ -46,17 +46,20 @@ A production-ready, cloud-native image sharing microservices platform demonstrat
 ## 🚀 Features
 
 ### Microservices
+
 - **API Gateway**: Rate limiting, circuit breaker, request validation, JWT verification
 - **Auth Service**: User registration, authentication, JWT token management, session handling
 - **Feed Service**: Image upload, feed management, S3 integration, caching
 - **Notification Service**: Event-driven notifications via Kafka
 
 ### Infrastructure
+
 - **Container Orchestration**: Kubernetes with HPA, PDB, and resource management
 - **Service Mesh Ready**: Prepared for Istio/Linkerd integration
 - **Infrastructure as Code**: Complete K8s manifests and Helm charts
 
 ### Observability (SRE)
+
 - **Distributed Tracing**: OpenTelemetry + Jaeger integration
 - **Metrics**: Prometheus with custom application metrics
 - **Dashboards**: Pre-configured Grafana dashboards
@@ -64,6 +67,7 @@ A production-ready, cloud-native image sharing microservices platform demonstrat
 - **Logging**: Structured JSON logging with correlation IDs
 
 ### Security
+
 - **Authentication**: JWT with refresh tokens
 - **Authorization**: RBAC implementation
 - **Encryption**: TLS everywhere, encrypted secrets
@@ -72,6 +76,7 @@ A production-ready, cloud-native image sharing microservices platform demonstrat
 - **Input Validation**: Comprehensive request validation
 
 ### Data Layer
+
 - **PostgreSQL**: Primary data store with migrations
 - **Redis**: Session storage and caching layer
 - **Kafka**: Event streaming for async operations
@@ -106,24 +111,25 @@ udagram-app/
 
 ## 🛠️ Technology Stack
 
-| Category | Technology |
-|----------|------------|
-| **Language** | Go 1.21+, TypeScript |
-| **Framework** | Gin (HTTP), GORM (ORM) |
-| **Database** | PostgreSQL 15 |
-| **Cache** | Redis 7 |
-| **Message Queue** | Apache Kafka |
-| **Container Runtime** | Docker, containerd |
-| **Orchestration** | Kubernetes 1.28+ |
-| **Tracing** | OpenTelemetry, Jaeger |
-| **Metrics** | Prometheus |
-| **Dashboards** | Grafana |
-| **CI/CD** | GitHub Actions |
-| **Cloud** | AWS (S3, RDS, EKS) |
+| Category              | Technology             |
+| --------------------- | ---------------------- |
+| **Language**          | Go 1.21+, TypeScript   |
+| **Framework**         | Gin (HTTP), GORM (ORM) |
+| **Database**          | PostgreSQL 15          |
+| **Cache**             | Redis 7                |
+| **Message Queue**     | Apache Kafka           |
+| **Container Runtime** | Docker, containerd     |
+| **Orchestration**     | Kubernetes 1.28+       |
+| **Tracing**           | OpenTelemetry, Jaeger  |
+| **Metrics**           | Prometheus             |
+| **Dashboards**        | Grafana                |
+| **CI/CD**             | GitHub Actions         |
+| **Cloud**             | AWS (S3, RDS, EKS)     |
 
 ## 🏃 Quick Start
 
 ### Prerequisites
+
 - Go 1.21+
 - Docker & Docker Compose
 - kubectl (for Kubernetes deployment)
@@ -232,12 +238,12 @@ curl http://localhost:8080/metrics
 
 ### Accessing Dashboards
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Grafana | http://localhost:3000 | admin/admin |
-| Prometheus | http://localhost:9090 | - |
-| Jaeger | http://localhost:16686 | - |
-| AlertManager | http://localhost:9093 | - |
+| Service      | URL                    | Credentials |
+| ------------ | ---------------------- | ----------- |
+| Grafana      | http://localhost:3000  | admin/admin |
+| Prometheus   | http://localhost:9090  | -           |
+| Jaeger       | http://localhost:16686 | -           |
+| AlertManager | http://localhost:9093  | -           |
 
 ### Key Metrics
 
@@ -330,12 +336,12 @@ The pipeline includes:
 
 ### Benchmarks
 
-| Endpoint | p50 | p95 | p99 | RPS |
-|----------|-----|-----|-----|-----|
-| GET /health | 1ms | 2ms | 5ms | 10000 |
-| POST /auth/login | 50ms | 100ms | 200ms | 500 |
-| GET /feed | 10ms | 30ms | 50ms | 2000 |
-| POST /feed | 20ms | 50ms | 100ms | 1000 |
+| Endpoint         | p50  | p95   | p99   | RPS   |
+| ---------------- | ---- | ----- | ----- | ----- |
+| GET /health      | 1ms  | 2ms   | 5ms   | 10000 |
+| POST /auth/login | 50ms | 100ms | 200ms | 500   |
+| GET /feed        | 10ms | 30ms  | 50ms  | 2000  |
+| POST /feed       | 20ms | 50ms  | 100ms | 1000  |
 
 ### Scaling Guidelines
 

@@ -1,0 +1,52 @@
+# Trivy Security Scanner Configuration
+# https://aquasecurity.github.io/trivy/
+
+# Scan settings
+scan:
+  # Enable vulnerability scanning
+  vulnerability:
+    type:
+      - os
+      - library
+    severity:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+  
+  # Enable secret scanning
+  secret:
+    config: ".trivy-secret.yaml"
+  
+  # Enable misconfiguration scanning  
+  misconfiguration:
+    terraform:
+      enabled: true
+    kubernetes:
+      enabled: true
+    docker:
+      enabled: true
+
+# Caching settings
+cache:
+  dir: ".trivy-cache"
+  ttl: "24h"
+
+# Report settings
+report:
+  format: json
+  output: "trivy-report.json"
+  template: ""
+
+# Ignore unfixed vulnerabilities
+ignore-unfixed: false
+
+# Ignore file for false positives
+ignorefile: ".trivyignore"
+
+# Database settings  
+db:
+  repository: "ghcr.io/aquasecurity/trivy-db"
+  skip-update: false
+
+# Timeout
+timeout: "10m0s"

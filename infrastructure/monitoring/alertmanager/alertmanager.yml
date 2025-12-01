@@ -1,32 +1,32 @@
 global:
-  smtp_smarthost: 'localhost:587'
-  smtp_from: 'alertmanager@udagram.com'
+  smtp_smarthost: "localhost:587"
+  smtp_from: "alertmanager@udagram.com"
   smtp_require_tls: false
 
 route:
-  group_by: ['alertname', 'severity']
+  group_by: ["alertname", "severity"]
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 4h
-  receiver: 'default-receiver'
+  receiver: "default-receiver"
   routes:
     - match:
         severity: critical
-      receiver: 'critical-receiver'
+      receiver: "critical-receiver"
       continue: true
     - match:
         severity: warning
-      receiver: 'warning-receiver'
+      receiver: "warning-receiver"
 
 receivers:
-  - name: 'default-receiver'
+  - name: "default-receiver"
     webhook_configs:
-      - url: 'http://localhost:5001/webhook'
+      - url: "http://localhost:5001/webhook"
         send_resolved: true
 
-  - name: 'critical-receiver'
+  - name: "critical-receiver"
     webhook_configs:
-      - url: 'http://localhost:5001/webhook/critical'
+      - url: "http://localhost:5001/webhook/critical"
         send_resolved: true
     # Slack configuration (uncomment and configure)
     # slack_configs:
@@ -36,9 +36,9 @@ receivers:
     #     title: '{{ .Status | toUpper }}: {{ .CommonAnnotations.summary }}'
     #     text: '{{ .CommonAnnotations.description }}'
 
-  - name: 'warning-receiver'
+  - name: "warning-receiver"
     webhook_configs:
-      - url: 'http://localhost:5001/webhook/warning'
+      - url: "http://localhost:5001/webhook/warning"
         send_resolved: true
     # Slack configuration (uncomment and configure)
     # slack_configs:
@@ -48,7 +48,7 @@ receivers:
 
 inhibit_rules:
   - source_match:
-      severity: 'critical'
+      severity: "critical"
     target_match:
-      severity: 'warning'
-    equal: ['alertname', 'job']
+      severity: "warning"
+    equal: ["alertname", "job"]

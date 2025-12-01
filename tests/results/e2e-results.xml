@@ -1,0 +1,139 @@
+<testsuites id="" name="" tests="52" failures="0" skipped="3" errors="0" time="4.641475000000001">
+<testsuite name="api/auth.spec.ts" timestamp="2025-12-01T01:18:03.088Z" hostname="api-tests" tests="14" failures="0" skipped="3" time="2.468" errors="0">
+<testcase name="Authentication API › User Registration › should register a new user successfully" classname="api/auth.spec.ts" time="0.309">
+</testcase>
+<testcase name="Authentication API › User Registration › should reject registration with invalid email" classname="api/auth.spec.ts" time="0.05">
+</testcase>
+<testcase name="Authentication API › User Registration › should reject registration with short password" classname="api/auth.spec.ts" time="0.042">
+</testcase>
+<testcase name="Authentication API › User Registration › should reject duplicate registration" classname="api/auth.spec.ts" time="0.306">
+</testcase>
+<testcase name="Authentication API › User Login › should login with valid credentials" classname="api/auth.spec.ts" time="0.267">
+</testcase>
+<testcase name="Authentication API › User Login › should reject login with wrong password" classname="api/auth.spec.ts" time="0.268">
+</testcase>
+<testcase name="Authentication API › User Login › should reject login with non-existent user" classname="api/auth.spec.ts" time="0.012">
+</testcase>
+<testcase name="Authentication API › Token Refresh › should refresh access token" classname="api/auth.spec.ts" time="0.332">
+</testcase>
+<testcase name="Authentication API › Token Refresh › should reject invalid refresh token" classname="api/auth.spec.ts" time="0.058">
+</testcase>
+<testcase name="Authentication API › Token Validation › should validate a valid access token" classname="api/auth.spec.ts" time="0">
+<properties>
+<property name="skip" value="">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication API › Token Validation › should reject invalid access token" classname="api/auth.spec.ts" time="0">
+<properties>
+<property name="skip" value="">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication API › Token Validation › should reject missing authorization header" classname="api/auth.spec.ts" time="0">
+<properties>
+<property name="skip" value="">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication API › Gateway Auth Routes › should proxy auth registration through gateway" classname="api/auth.spec.ts" time="0.274">
+</testcase>
+<testcase name="Authentication API › Gateway Auth Routes › should proxy auth login through gateway" classname="api/auth.spec.ts" time="0.55">
+</testcase>
+</testsuite>
+<testsuite name="api/feed.spec.ts" timestamp="2025-12-01T01:18:03.088Z" hostname="api-tests" tests="14" failures="0" skipped="0" time="0.333" errors="0">
+<testcase name="Feed API › Feed Listing › should get empty feed initially" classname="api/feed.spec.ts" time="0.018">
+</testcase>
+<testcase name="Feed API › Feed Listing › should support pagination" classname="api/feed.spec.ts" time="0.028">
+</testcase>
+<testcase name="Feed API › Feed Listing › should handle invalid page parameters gracefully" classname="api/feed.spec.ts" time="0.009">
+</testcase>
+<testcase name="Feed API › Feed Item Creation › should create a feed item" classname="api/feed.spec.ts" time="0.02">
+</testcase>
+<testcase name="Feed API › Feed Item Creation › should reject feed item without caption" classname="api/feed.spec.ts" time="0.008">
+</testcase>
+<testcase name="Feed API › Feed Item Creation › should reject feed item with invalid URL" classname="api/feed.spec.ts" time="0.014">
+</testcase>
+<testcase name="Feed API › Feed Item Retrieval › should get a specific feed item" classname="api/feed.spec.ts" time="0.028">
+</testcase>
+<testcase name="Feed API › Feed Item Retrieval › should return 404 for non-existent item" classname="api/feed.spec.ts" time="0.011">
+</testcase>
+<testcase name="Feed API › Feed Item Update › should update a feed item" classname="api/feed.spec.ts" time="0.031">
+</testcase>
+<testcase name="Feed API › Feed Item Deletion › should delete a feed item" classname="api/feed.spec.ts" time="0.042">
+</testcase>
+<testcase name="Feed API › Feed Likes › should like a feed item" classname="api/feed.spec.ts" time="0.035">
+</testcase>
+<testcase name="Feed API › Feed Likes › should unlike a feed item" classname="api/feed.spec.ts" time="0.028">
+</testcase>
+<testcase name="Feed API › Gateway Feed Routes › should proxy feed list through gateway" classname="api/feed.spec.ts" time="0.02">
+</testcase>
+<testcase name="Feed API › Gateway Feed Routes › should proxy feed creation through gateway" classname="api/feed.spec.ts" time="0.041">
+</testcase>
+</testsuite>
+<testsuite name="health/health.spec.ts" timestamp="2025-12-01T01:18:03.088Z" hostname="health-checks" tests="7" failures="0" skipped="0" time="0.378" errors="0">
+<testcase name="Service Health Checks › Gateway service is healthy" classname="health/health.spec.ts" time="0.059">
+</testcase>
+<testcase name="Service Health Checks › Auth service is healthy" classname="health/health.spec.ts" time="0.057">
+</testcase>
+<testcase name="Service Health Checks › Feed service is healthy" classname="health/health.spec.ts" time="0.051">
+</testcase>
+<testcase name="Service Health Checks › Notification service is healthy" classname="health/health.spec.ts" time="0.055">
+</testcase>
+<testcase name="Service Health Checks › All services respond within acceptable time" classname="health/health.spec.ts" time="0.082">
+<system-out>
+<![CDATA[Gateway responded in 26ms
+Auth responded in 8ms
+Feed responded in 6ms
+Notification responded in 5ms
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Health Checks › Metrics endpoints are accessible" classname="health/health.spec.ts" time="0.06">
+</testcase>
+<testcase name="Service Health Checks › Ready endpoint works" classname="health/health.spec.ts" time="0.014">
+</testcase>
+</testsuite>
+<testsuite name="integration/user-journeys.spec.ts" timestamp="2025-12-01T01:18:03.088Z" hostname="integration" tests="17" failures="0" skipped="0" time="2.78" errors="0">
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 1: User registers successfully" classname="integration/user-journeys.spec.ts" time="0.345">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 2: User logs in with credentials" classname="integration/user-journeys.spec.ts" time="0.263">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 3: User browses the feed" classname="integration/user-journeys.spec.ts" time="0.015">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 4: User creates a feed post" classname="integration/user-journeys.spec.ts" time="0.019">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 5: User views their created post" classname="integration/user-journeys.spec.ts" time="0.01">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 6: User likes their post" classname="integration/user-journeys.spec.ts" time="0.01">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 7: User updates their post" classname="integration/user-journeys.spec.ts" time="0.012">
+</testcase>
+<testcase name="End-to-End User Journeys › Complete User Registration and Feed Journey › Step 8: User can refresh their token" classname="integration/user-journeys.spec.ts" time="0.241">
+</testcase>
+<testcase name="End-to-End User Journeys › Multi-User Interaction › Two users can interact with the same feed item" classname="integration/user-journeys.spec.ts" time="0.604">
+</testcase>
+<testcase name="End-to-End User Journeys › Error Handling Journey › User receives proper error for invalid registration" classname="integration/user-journeys.spec.ts" time="0.05">
+</testcase>
+<testcase name="End-to-End User Journeys › Error Handling Journey › User receives proper error for invalid login" classname="integration/user-journeys.spec.ts" time="0.069">
+</testcase>
+<testcase name="End-to-End User Journeys › Error Handling Journey › User receives 404 for non-existent feed item" classname="integration/user-journeys.spec.ts" time="0.049">
+</testcase>
+<testcase name="End-to-End User Journeys › Error Handling Journey › User receives error for invalid feed data" classname="integration/user-journeys.spec.ts" time="0.302">
+</testcase>
+<testcase name="End-to-End User Journeys › Performance Baseline › Health checks complete within SLO" classname="integration/user-journeys.spec.ts" time="0.033">
+</testcase>
+<testcase name="End-to-End User Journeys › Performance Baseline › Feed list retrieval within SLO" classname="integration/user-journeys.spec.ts" time="0.013">
+</testcase>
+<testcase name="End-to-End User Journeys › Performance Baseline › Registration flow within SLO" classname="integration/user-journeys.spec.ts" time="0.261">
+</testcase>
+<testcase name="End-to-End User Journeys › Performance Baseline › Login flow within SLO" classname="integration/user-journeys.spec.ts" time="0.484">
+</testcase>
+</testsuite>
+</testsuites>

@@ -12,7 +12,7 @@ groups:
           severity: critical
         annotations:
           summary: "High error rate on {{ $labels.job }}"
-          description: "Error rate is {{ printf \"%.2f\" $value }}% on {{ $labels.job }}"
+          description: 'Error rate is {{ printf "%.2f" $value }}% on {{ $labels.job }}'
 
       # High latency
       - alert: HighLatency
@@ -23,7 +23,7 @@ groups:
           severity: warning
         annotations:
           summary: "High latency on {{ $labels.job }}"
-          description: "P95 latency is {{ printf \"%.2f\" $value }}s on {{ $labels.job }}"
+          description: 'P95 latency is {{ printf "%.2f" $value }}s on {{ $labels.job }}'
 
       # Service down
       - alert: ServiceDown
@@ -44,7 +44,7 @@ groups:
           severity: warning
         annotations:
           summary: "High memory usage on {{ $labels.job }}"
-          description: "Memory usage is {{ printf \"%.0f\" $value }}MB on {{ $labels.job }}"
+          description: 'Memory usage is {{ printf "%.0f" $value }}MB on {{ $labels.job }}'
 
       # Database connection issues
       - alert: DatabaseConnectionsExhausted
@@ -68,7 +68,7 @@ groups:
           severity: warning
         annotations:
           summary: "High cache miss rate"
-          description: "Cache miss rate is {{ printf \"%.2f\" $value }}%"
+          description: 'Cache miss rate is {{ printf "%.2f" $value }}%'
 
       # Rate limiting triggered
       - alert: RateLimitingTriggered
@@ -79,7 +79,7 @@ groups:
           severity: warning
         annotations:
           summary: "High rate of rate-limited requests"
-          description: "{{ printf \"%.0f\" $value }} requests/s are being rate limited"
+          description: '{{ printf "%.0f" $value }} requests/s are being rate limited'
 
   - name: infrastructure-alerts
     rules:

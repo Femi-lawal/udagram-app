@@ -1,0 +1,9 @@
+# Trivy Ignore File
+# List of CVEs and vulnerabilities to ignore
+
+# Go vulnerabilities that are not exploitable in our context
+# Example: CVE-2023-XXXXX
+
+# False positives in test files
+# Example: secret-detection:test/
+

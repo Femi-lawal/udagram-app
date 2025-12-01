@@ -1,10 +1,10 @@
 apiVersion: 1
 
 providers:
-  - name: 'Udagram Dashboards'
+  - name: "Udagram Dashboards"
     orgId: 1
-    folder: 'Udagram'
-    folderUid: 'udagram'
+    folder: "Udagram"
+    folderUid: "udagram"
     type: file
     disableDeletion: false
     editable: true
