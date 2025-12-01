@@ -12,12 +12,12 @@ scan:
       - CRITICAL
       - HIGH
       - MEDIUM
-  
+
   # Enable secret scanning
   secret:
     config: ".trivy-secret.yaml"
-  
-  # Enable misconfiguration scanning  
+
+  # Enable misconfiguration scanning
   misconfiguration:
     terraform:
       enabled: true
@@ -43,7 +43,7 @@ ignore-unfixed: false
 # Ignore file for false positives
 ignorefile: ".trivyignore"
 
-# Database settings  
+# Database settings
 db:
   repository: "ghcr.io/aquasecurity/trivy-db"
   skip-update: false

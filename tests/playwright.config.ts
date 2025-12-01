@@ -1,23 +1,23 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-    ['json', { outputFile: 'results/e2e-results.json' }],
-    ['junit', { outputFile: 'results/e2e-results.xml' }],
+    ["list"],
+    ["html", { open: "never" }],
+    ["json", { outputFile: "results/e2e-results.json" }],
+    ["junit", { outputFile: "results/e2e-results.xml" }],
   ],
-  
+
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:8080',
-    trace: 'on-first-retry',
-    video: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    baseURL: process.env.BASE_URL || "http://localhost:8080",
+    trace: "on-first-retry",
+    video: "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   // Global timeout
@@ -28,19 +28,19 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'api-tests',
-      testDir: './e2e/api',
-      use: { },
+      name: "api-tests",
+      testDir: "./e2e/api",
+      use: {},
     },
     {
-      name: 'health-checks',
-      testDir: './e2e/health',
-      use: { },
+      name: "health-checks",
+      testDir: "./e2e/health",
+      use: {},
     },
     {
-      name: 'integration',
-      testDir: './e2e/integration',
-      use: { },
+      name: "integration",
+      testDir: "./e2e/integration",
+      use: {},
     },
   ],
 

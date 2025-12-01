@@ -3,18 +3,21 @@
 ## Pre-Deployment Checklist
 
 ### 1. Code Review Completed
+
 - [ ] All PRs merged and approved
 - [ ] Tests passing in CI/CD
 - [ ] Security scan completed
 - [ ] Performance tests passed
 
 ### 2. Infrastructure Ready
+
 - [ ] Database migrations reviewed
 - [ ] Config changes documented
 - [ ] Rollback plan documented
 - [ ] Monitoring dashboards ready
 
 ### 3. Communication
+
 - [ ] Team notified of deployment window
 - [ ] Stakeholders informed
 - [ ] On-call engineer available
@@ -124,9 +127,9 @@ FAILED=0
 for service in "${SERVICES[@]}"; do
     name="${service%%:*}"
     port="${service##*:}"
-    
+
     response=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${port}/health")
-    
+
     if [ "$response" == "200" ]; then
         echo "✅ $name is healthy"
     else

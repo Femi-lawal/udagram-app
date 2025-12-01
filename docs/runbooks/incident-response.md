@@ -2,12 +2,12 @@
 
 ## Severity Levels
 
-| Severity | Description | Response Time | Example |
-|----------|-------------|---------------|---------|
-| P1 | Complete outage | 5 minutes | All services down |
-| P2 | Major degradation | 15 minutes | Auth service down |
-| P3 | Minor degradation | 1 hour | High latency |
-| P4 | Low impact | 4 hours | Non-critical errors |
+| Severity | Description       | Response Time | Example             |
+| -------- | ----------------- | ------------- | ------------------- |
+| P1       | Complete outage   | 5 minutes     | All services down   |
+| P2       | Major degradation | 15 minutes    | Auth service down   |
+| P3       | Minor degradation | 1 hour        | High latency        |
+| P4       | Low impact        | 4 hours       | Non-critical errors |
 
 ## Initial Response (OODA Loop)
 
@@ -43,6 +43,7 @@ curl http://localhost:9093/api/v1/alerts
 ### 3. Decide - Plan response
 
 Based on symptoms:
+
 - **All services down** → Check infrastructure (Docker, network)
 - **Single service down** → Check specific service logs
 - **High latency** → Check database connections, resource usage
@@ -68,6 +69,7 @@ docker-compose logs -f <service-name>
 **Symptoms**: Health check fails, 502/503 errors
 
 **Diagnosis**:
+
 ```bash
 # Check if container is running
 docker-compose ps <service>
@@ -80,6 +82,7 @@ docker stats
 ```
 
 **Resolution**:
+
 ```bash
 # Restart the service
 docker-compose restart <service>
@@ -96,6 +99,7 @@ docker inspect <container_id> | grep OOMKilled
 **Symptoms**: "connection refused", "too many connections"
 
 **Diagnosis**:
+
 ```bash
 # Check PostgreSQL
 docker-compose exec postgres psql -U postgres -c "SELECT count(*) FROM pg_stat_activity;"
@@ -105,12 +109,13 @@ docker-compose exec postgres psql -U postgres -c "SHOW max_connections;"
 ```
 
 **Resolution**:
+
 ```bash
 # Kill idle connections
 docker-compose exec postgres psql -U postgres -c "
-  SELECT pg_terminate_backend(pid) 
-  FROM pg_stat_activity 
-  WHERE state = 'idle' 
+  SELECT pg_terminate_backend(pid)
+  FROM pg_stat_activity
+  WHERE state = 'idle'
   AND query_start < NOW() - INTERVAL '5 minutes';
 "
 
@@ -123,6 +128,7 @@ docker-compose restart postgres
 **Symptoms**: OOM kills, slow response times
 
 **Diagnosis**:
+
 ```bash
 # Check memory usage
 docker stats --no-stream
@@ -132,6 +138,7 @@ curl http://localhost:8080/debug/pprof/heap?debug=1
 ```
 
 **Resolution**:
+
 ```bash
 # Trigger garbage collection (if exposed)
 # For Go services, GC runs automatically
@@ -148,6 +155,7 @@ kubectl scale deployment/<service> --replicas=3
 **Symptoms**: Cache misses, slow response times
 
 **Diagnosis**:
+
 ```bash
 # Check Redis status
 docker-compose exec redis redis-cli ping
@@ -160,6 +168,7 @@ docker-compose exec redis redis-cli client list
 ```
 
 **Resolution**:
+
 ```bash
 # Clear Redis cache if needed
 docker-compose exec redis redis-cli FLUSHDB
@@ -173,6 +182,7 @@ docker-compose restart redis
 **Symptoms**: Notification delays, message backlog
 
 **Diagnosis**:
+
 ```bash
 # Check Kafka broker status
 docker-compose exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092
@@ -182,6 +192,7 @@ docker-compose exec kafka kafka-consumer-groups --bootstrap-server localhost:909
 ```
 
 **Resolution**:
+
 ```bash
 # Restart Kafka consumer
 docker-compose restart notification
@@ -213,9 +224,11 @@ docker-compose exec kafka kafka-topics --bootstrap-server localhost:9092 --creat
 ## Incident Report - [DATE]
 
 ### Summary
+
 Brief description of the incident
 
 ### Timeline
+
 - HH:MM - Alert triggered
 - HH:MM - On-call acknowledged
 - HH:MM - Root cause identified
@@ -223,29 +236,34 @@ Brief description of the incident
 - HH:MM - Service restored
 
 ### Root Cause
+
 Detailed explanation of what caused the incident
 
 ### Impact
+
 - Duration: X minutes
 - Users affected: Y
 - Revenue impact: $Z
 
 ### Resolution
+
 What was done to fix the issue
 
 ### Action Items
+
 1. [ ] Permanent fix for root cause
 2. [ ] Improve monitoring
 3. [ ] Update runbook
 
 ### Lessons Learned
+
 What we learned from this incident
 ```
 
 ## Emergency Contacts
 
-| Role | Contact | Phone |
-|------|---------|-------|
-| On-call SRE | pager@company.com | +1-XXX-XXX-XXXX |
-| Platform Lead | platform@company.com | +1-XXX-XXX-XXXX |
-| Database Admin | dba@company.com | +1-XXX-XXX-XXXX |
+| Role           | Contact              | Phone           |
+| -------------- | -------------------- | --------------- |
+| On-call SRE    | pager@company.com    | +1-XXX-XXX-XXXX |
+| Platform Lead  | platform@company.com | +1-XXX-XXX-XXXX |
+| Database Admin | dba@company.com      | +1-XXX-XXX-XXXX |

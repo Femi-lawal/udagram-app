@@ -6,11 +6,11 @@ This runbook addresses situations where API response times exceed SLO thresholds
 
 ### SLO Thresholds
 
-| Percentile | Threshold | Alert |
-|------------|-----------|-------|
-| p50 | 100ms | Warning |
-| p95 | 300ms | Warning |
-| p99 | 1000ms | Critical |
+| Percentile | Threshold | Alert    |
+| ---------- | --------- | -------- |
+| p50        | 100ms     | Warning  |
+| p95        | 300ms     | Warning  |
+| p99        | 1000ms    | Critical |
 
 ## Quick Diagnosis
 
@@ -43,8 +43,8 @@ docker-compose exec postgres psql -U postgres -c "
 
 # Check active connections
 docker-compose exec postgres psql -U postgres -c "
-  SELECT count(*), state 
-  FROM pg_stat_activity 
+  SELECT count(*), state
+  FROM pg_stat_activity
   GROUP BY state;
 "
 ```
@@ -108,8 +108,8 @@ docker-compose restart <service>
 ```bash
 # Kill long-running queries
 docker-compose exec postgres psql -U postgres -c "
-  SELECT pg_terminate_backend(pid) 
-  FROM pg_stat_activity 
+  SELECT pg_terminate_backend(pid)
+  FROM pg_stat_activity
   WHERE duration > interval '30 seconds'
   AND state = 'active';
 "
@@ -175,12 +175,12 @@ docker-compose exec redis redis-cli INFO stats | grep keyspace
 
 ### Common Patterns
 
-| Pattern | Cause | Solution |
-|---------|-------|----------|
-| DB spans slow | Query performance | Add indexes, optimize queries |
-| Redis spans slow | Network/memory | Check Redis memory, network |
-| Service spans slow | CPU bound | Scale horizontally |
-| External API slow | Third-party issue | Add circuit breaker |
+| Pattern            | Cause             | Solution                      |
+| ------------------ | ----------------- | ----------------------------- |
+| DB spans slow      | Query performance | Add indexes, optimize queries |
+| Redis spans slow   | Network/memory    | Check Redis memory, network   |
+| Service spans slow | CPU bound         | Scale horizontally            |
+| External API slow  | Third-party issue | Add circuit breaker           |
 
 ## Metrics to Monitor
 
@@ -191,13 +191,13 @@ docker-compose exec redis redis-cli INFO stats | grep keyspace
 sum(rate(http_requests_total[5m])) by (service, status)
 
 # P95 latency by endpoint
-histogram_quantile(0.95, 
+histogram_quantile(0.95,
   sum(rate(http_request_duration_seconds_bucket[5m])) by (le, path)
 )
 
 # Error rate
-sum(rate(http_requests_total{status=~"5.."}[5m])) 
-/ 
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+/
 sum(rate(http_requests_total[5m]))
 
 # Active connections
@@ -216,11 +216,13 @@ Navigate to the SLO Dashboard and check:
 ## Escalation Criteria
 
 Escalate to L2 if:
+
 - Latency remains high for > 15 minutes after remediation
 - Root cause is not identifiable
 - Infrastructure changes are required
 
 Escalate to L3 if:
+
 - Multiple services affected
 - Database or infrastructure failure
 - Requires code changes for fix
