@@ -518,15 +518,13 @@ export class LoginComponent {
       },
       error: () => {
         // Even if API fails, use mock login for demo
-        this.authService
-          .login(demoUser.email, "demo123456")
-          .subscribe({
-            next: () => this.router.navigate(["/feed"]),
-            error: () => {
-              this.demoLoading.set(false);
-              this.router.navigate(["/feed"]);
-            },
-          });
+        this.authService.login(demoUser.email, "demo123456").subscribe({
+          next: () => this.router.navigate(["/feed"]),
+          error: () => {
+            this.demoLoading.set(false);
+            this.router.navigate(["/feed"]);
+          },
+        });
       },
     });
   }

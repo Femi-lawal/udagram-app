@@ -1,13 +1,16 @@
 # Stage 1: Build the Angular application
 FROM node:20-alpine AS build
 
+# Install libc6-compat for rollup compatibility on Alpine
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies - remove lock and cache for clean install
+RUN rm -rf node_modules package-lock.json && npm cache clean --force && npm install
 
 # Copy source code
 COPY . .

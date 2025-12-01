@@ -247,6 +247,42 @@ services:
       - udagram-network
     restart: unless-stopped
 
+  # Frontend (Angular App served via Nginx)
+  frontend:
+    build:
+      context: ./udagram-frontend
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - udagram-network
+    restart: unless-stopped
+
+  # Reverse Proxy (Nginx - Public Entry Point)
+  reverse-proxy:
+    build:
+      context: ./udagram-reverse-proxy
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+      - frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - udagram-network
+    restart: unless-stopped
+
 networks:
   udagram-network:
     driver: bridge
