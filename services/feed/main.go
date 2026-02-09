@@ -12,7 +12,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -149,21 +148,12 @@ func main() {
 	// Initialize S3 client
 	var s3Client *s3.Client
 	awsRegion := getEnv("AWS_REGION", "us-east-1")
-	awsAccessKey := getEnv("AWS_ACCESS_KEY_ID", "")
-	awsSecretKey := getEnv("AWS_SECRET_ACCESS_KEY", "")
-
-	if awsAccessKey != "" && awsSecretKey != "" {
-		cfg, err := config.LoadDefaultConfig(ctx,
-			config.WithRegion(awsRegion),
-			config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-				awsAccessKey, awsSecretKey, "",
-			)),
-		)
-		if err != nil {
-			logger.Warn("failed to load AWS config", zap.Error(err))
-		} else {
-			s3Client = s3.NewFromConfig(cfg)
-		}
+	// Load AWS configuration (supports Env Vars, IRSA, Shared Config)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(awsRegion))
+	if err != nil {
+		logger.Warn("failed to load AWS config", zap.Error(err))
+	} else {
+		s3Client = s3.NewFromConfig(cfg)
 	}
 
 	// Create feed service
