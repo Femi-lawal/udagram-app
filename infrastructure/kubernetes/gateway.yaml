@@ -1,8 +1,8 @@
-apiVersion: apps/v1
-kind: Deployment
 # checkov:skip=CKV_K8S_35:Secrets as env vars are intentional
 # checkov:skip=CKV_K8S_43:Use tags for ease of deployment
 # checkov:skip=CKV_K8S_40:User 1000 is sufficient
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: gateway
   namespace: udagram

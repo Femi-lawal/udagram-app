@@ -1,8 +1,8 @@
+# checkov:skip=CKV_K8S_43:Use tags for ease of deployment
+# checkov:skip=CKV_K8S_40:User 1000 is sufficient
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  # checkov:skip=CKV_K8S_43:Use tags for ease of deployment
-  # checkov:skip=CKV_K8S_40:User 1000 is sufficient
   name: zookeeper
   namespace: udagram
   labels:
@@ -95,12 +95,11 @@ spec:
   selector:
     app: zookeeper
 ---
+# checkov:skip=CKV_K8S_43:Use tags for ease of deployment
+# checkov:skip=CKV_K8S_40:User 1000 is sufficient
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  # checkov:skip=CKV_K8S_43:Use tags for ease of deployment
-  # checkov:skip=CKV_K8S_40:User 1000 is sufficient
-  name: kafka
   namespace: udagram
   labels:
     app: kafka
