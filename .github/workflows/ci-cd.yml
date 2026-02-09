@@ -14,6 +14,26 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
 jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      has-docker-secrets: ${{ steps.check.outputs.has-docker }}
+      has-aws-secrets: ${{ steps.check.outputs.has-aws }}
+    steps:
+      - id: check
+        run: |
+          if [ -n "${{ secrets.DOCKER_USERNAME }}" ] && [ -n "${{ secrets.DOCKER_PASSWORD }}" ]; then
+            echo "has-docker=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-docker=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [ -n "${{ secrets.AWS_ROLE_ARN }}" ]; then
+            echo "has-aws=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-aws=false" >> $GITHUB_OUTPUT
+          fi
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -161,8 +181,8 @@ jobs:
   docker:
     name: Build Docker Images
     runs-on: ubuntu-latest
-    needs: [build]
-    if: github.event_name != 'pull_request' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != ''
+    needs: [build, check-secrets]
+    if: github.event_name != 'pull_request' && needs.check-secrets.outputs.has-docker-secrets == 'true'
     strategy:
       matrix:
         service: [gateway, auth, feed, notification]
@@ -208,8 +228,8 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [docker]
-    if: github.ref == 'refs/heads/develop' && secrets.AWS_ROLE_ARN != ''
+    needs: [docker, check-secrets]
+    if: github.ref == 'refs/heads/develop' && needs.check-secrets.outputs.has-aws-secrets == 'true'
     environment: staging
     permissions:
       id-token: write
@@ -247,8 +267,8 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [docker]
-    if: github.event_name == 'release' && secrets.AWS_ROLE_ARN != ''
+    needs: [docker, check-secrets]
+    if: github.event_name == 'release' && needs.check-secrets.outputs.has-aws-secrets == 'true'
     environment: production
     permissions:
       id-token: write
