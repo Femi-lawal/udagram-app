@@ -162,7 +162,7 @@ jobs:
     name: Build Docker Images
     runs-on: ubuntu-latest
     needs: [build]
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != ''
     strategy:
       matrix:
         service: [gateway, auth, feed, notification]
@@ -209,7 +209,7 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: [docker]
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' && secrets.AWS_ROLE_ARN != ''
     environment: staging
     permissions:
       id-token: write
@@ -248,7 +248,7 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [docker]
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && secrets.AWS_ROLE_ARN != ''
     environment: production
     permissions:
       id-token: write
