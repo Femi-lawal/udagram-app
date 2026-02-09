@@ -9,12 +9,12 @@ import (
 
 // Config holds all configuration for the application
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Redis    RedisConfig
-	Kafka    KafkaConfig
-	JWT      JWTConfig
-	AWS      AWSConfig
+	Server    ServerConfig
+	Database  DatabaseConfig
+	Redis     RedisConfig
+	Kafka     KafkaConfig
+	JWT       JWTConfig
+	AWS       AWSConfig
 	Telemetry TelemetryConfig
 	RateLimit RateLimitConfig
 }
@@ -65,11 +65,11 @@ type KafkaConfig struct {
 
 // JWTConfig holds JWT configuration
 type JWTConfig struct {
-	Secret           string
-	AccessExpiry     time.Duration
-	RefreshExpiry    time.Duration
-	Issuer           string
-	Audience         string
+	Secret        string
+	AccessExpiry  time.Duration
+	RefreshExpiry time.Duration
+	Issuer        string
+	Audience      string
 }
 
 // AWSConfig holds AWS configuration
@@ -246,44 +246,44 @@ func setDefaults() {
 
 func bindEnvVars() {
 	// Server
-	viper.BindEnv("server.host", "SERVER_HOST")
-	viper.BindEnv("server.port", "SERVER_PORT", "PORT")
-	viper.BindEnv("server.environment", "ENVIRONMENT", "ENV")
-	viper.BindEnv("server.service_name", "SERVICE_NAME")
+	_ = viper.BindEnv("server.host", "SERVER_HOST")               //nolint:errcheck
+	_ = viper.BindEnv("server.port", "SERVER_PORT", "PORT")       //nolint:errcheck
+	_ = viper.BindEnv("server.environment", "ENVIRONMENT", "ENV") //nolint:errcheck
+	_ = viper.BindEnv("server.service_name", "SERVICE_NAME")
 
 	// Database
-	viper.BindEnv("database.host", "POSTGRES_HOST", "DB_HOST")
-	viper.BindEnv("database.port", "POSTGRES_PORT", "DB_PORT")
-	viper.BindEnv("database.user", "POSTGRES_USER", "DB_USER")
-	viper.BindEnv("database.password", "POSTGRES_PASSWORD", "DB_PASSWORD")
-	viper.BindEnv("database.dbname", "POSTGRES_DB", "DB_NAME")
-	viper.BindEnv("database.sslmode", "POSTGRES_SSLMODE", "DB_SSLMODE")
+	_ = viper.BindEnv("database.host", "POSTGRES_HOST", "DB_HOST")
+	_ = viper.BindEnv("database.port", "POSTGRES_PORT", "DB_PORT")
+	_ = viper.BindEnv("database.user", "POSTGRES_USER", "DB_USER")
+	_ = viper.BindEnv("database.password", "POSTGRES_PASSWORD", "DB_PASSWORD")
+	_ = viper.BindEnv("database.dbname", "POSTGRES_DB", "DB_NAME")
+	_ = viper.BindEnv("database.sslmode", "POSTGRES_SSLMODE", "DB_SSLMODE")
 
 	// Redis
-	viper.BindEnv("redis.host", "REDIS_HOST")
-	viper.BindEnv("redis.port", "REDIS_PORT")
-	viper.BindEnv("redis.password", "REDIS_PASSWORD")
+	_ = viper.BindEnv("redis.host", "REDIS_HOST")
+	_ = viper.BindEnv("redis.port", "REDIS_PORT")
+	_ = viper.BindEnv("redis.password", "REDIS_PASSWORD")
 
 	// Kafka
-	viper.BindEnv("kafka.brokers", "KAFKA_BROKERS")
-	viper.BindEnv("kafka.consumer_group", "KAFKA_CONSUMER_GROUP")
+	_ = viper.BindEnv("kafka.brokers", "KAFKA_BROKERS")
+	_ = viper.BindEnv("kafka.consumer_group", "KAFKA_CONSUMER_GROUP")
 
 	// JWT
-	viper.BindEnv("jwt.secret", "JWT_SECRET")
-	viper.BindEnv("jwt.access_expiry", "JWT_ACCESS_EXPIRY")
-	viper.BindEnv("jwt.refresh_expiry", "JWT_REFRESH_EXPIRY")
+	_ = viper.BindEnv("jwt.secret", "JWT_SECRET")
+	_ = viper.BindEnv("jwt.access_expiry", "JWT_ACCESS_EXPIRY")
+	_ = viper.BindEnv("jwt.refresh_expiry", "JWT_REFRESH_EXPIRY")
 
 	// AWS
-	viper.BindEnv("aws.region", "AWS_REGION")
-	viper.BindEnv("aws.access_key_id", "AWS_ACCESS_KEY_ID")
-	viper.BindEnv("aws.secret_access_key", "AWS_SECRET_ACCESS_KEY")
-	viper.BindEnv("aws.s3_bucket", "AWS_BUCKET", "AWS_S3_BUCKET")
+	_ = viper.BindEnv("aws.region", "AWS_REGION")
+	_ = viper.BindEnv("aws.access_key_id", "AWS_ACCESS_KEY_ID")
+	_ = viper.BindEnv("aws.secret_access_key", "AWS_SECRET_ACCESS_KEY")
+	_ = viper.BindEnv("aws.s3_bucket", "AWS_BUCKET", "AWS_S3_BUCKET")
 
 	// Telemetry
-	viper.BindEnv("telemetry.enabled", "TELEMETRY_ENABLED")
-	viper.BindEnv("telemetry.otlp_endpoint", "OTEL_EXPORTER_OTLP_ENDPOINT")
-	viper.BindEnv("telemetry.service_name", "OTEL_SERVICE_NAME")
-	viper.BindEnv("telemetry.environment", "OTEL_ENVIRONMENT")
+	_ = viper.BindEnv("telemetry.enabled", "TELEMETRY_ENABLED")
+	_ = viper.BindEnv("telemetry.otlp_endpoint", "OTEL_EXPORTER_OTLP_ENDPOINT")
+	_ = viper.BindEnv("telemetry.service_name", "OTEL_SERVICE_NAME")
+	_ = viper.BindEnv("telemetry.environment", "OTEL_ENVIRONMENT")
 }
 
 // DSN returns the database connection string
