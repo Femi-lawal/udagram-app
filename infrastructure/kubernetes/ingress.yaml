@@ -12,6 +12,7 @@ metadata:
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # checkov:skip=CKV_K8S_153:Use snippets for security headers
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "X-Frame-Options: SAMEORIGIN";
       more_set_headers "X-Content-Type-Options: nosniff";

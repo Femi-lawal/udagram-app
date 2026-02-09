@@ -1,5 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
+# checkov:skip=CKV_K8S_35:Secrets as env vars are intentional
+# checkov:skip=CKV_K8S_43:Use tags for ease of deployment
+# checkov:skip=CKV_K8S_40:User 1000 is sufficient
 metadata:
   name: feed
   namespace: udagram
@@ -27,6 +30,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: feed
           image: femilawal/udagram-feed:v1

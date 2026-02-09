@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  # checkov:skip=CKV_K8S_43:Use tags for ease of deployment
+  # checkov:skip=CKV_K8S_40:User 1000 is sufficient
   name: zookeeper
   namespace: udagram
   labels:
@@ -20,6 +22,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: zookeeper
           image: confluentinc/cp-zookeeper:7.5.0
@@ -94,6 +98,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  # checkov:skip=CKV_K8S_43:Use tags for ease of deployment
+  # checkov:skip=CKV_K8S_40:User 1000 is sufficient
   name: kafka
   namespace: udagram
   labels:
@@ -113,6 +119,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: kafka
           image: confluentinc/cp-kafka:7.5.0
